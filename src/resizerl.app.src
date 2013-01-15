@@ -1,0 +1,11 @@
+{application, resizerl,
+  [
+   {description, "Image resizing"},
+   {vsn, "0.1.0"},
+   {id, "resizerl"},
+   {registered, []},
+   {applications, [kernel, stdlib]},
+   {mod, {resizerl, []}},
+   {env, []}
+  ]
+}.
