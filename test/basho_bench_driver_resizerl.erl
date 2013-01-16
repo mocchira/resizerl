@@ -5,12 +5,12 @@
 
 -include("basho_bench.hrl").
 
--record(state, {test_images, width, height}).
+-record(state, {id, test_images, width, height}).
 
 %% ====================================================================
 %% API
 %% ====================================================================
-new(_Id) ->
+new(Id) ->
     %% The IPs, port and path we'll be testing
     SrcDir = basho_bench_config:get(src_dir, "~/test/images/"),
     Width  = basho_bench_config:get(width,   800),
@@ -40,15 +40,17 @@ new(_Id) ->
         _ -> void
     end,
     random:seed(),
-    resizerl:start(),
+    ResId = list_to_atom(lists:concat(['resizerl_', Id])),
+    resizerl:start(ResId),
     {ok, #state { test_images = TestImages,
+                  id = ResId,
                   width = Width,
                   height = Height }}.
 
 %% public interface
 run(_, _KeyGen, _ValueGen, State) ->
     {Filename, ImgBin} = next_image(State#state.test_images),
-    case resizerl:resize(Filename, ImgBin, State#state.width, State#state.height) of
+    case resizerl:resize(State#state.id, Filename, ImgBin, State#state.width, State#state.height) of
         {ok, _Bin} ->
             {ok, State};
         {error, Reason} ->
